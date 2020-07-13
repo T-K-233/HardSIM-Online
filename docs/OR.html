@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Microsoft YaHei UI;
+    }
+    button {
+      border: 1px solid #000;
+      color: #FFFFFF;
+      background: #666666;
+    }
+    button:hover {
+      cursor: pointer;
+    }
+    
+    .container {
+      width: 60%;
+      margin: auto;
+    }
+  </style>
+  <script src="./hardlib.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>或门 | OR Gate</h2>
+    <p>或门具有 2 个以上的输入端 和 1 个输出端。只要输入中有 1 个为逻辑 1 时，输出就为逻辑 1；只有当所有的输入全为逻辑 0 时，输出才为逻辑 0。</p>
+    <canvas id="canvas"></canvas>
+  </div>
+  <script>
+  
+  const ON_COLOR = "#00EE00";
+  const OFF_COLOR = "#006600";
+  
+  var cvs, ctx;
+  
+  const GRID_SIZE = 10;
+  var scale = 1;
+  
+
+  var wires = [
+    new Wire(),
+    new Wire(),
+    new Wire()
+  ];
+  
+  components = [
+    new InputButton([5, 5], wires[0]), 
+    new InputButton([5, 7], wires[1]), 
+    new OR([8, 6], wires[0], wires[1], wires[2]),
+    new LED([11, 6], wires[2]),
+  ];
+  
+  
+  window.onload = function() {
+    cvs = canvas;
+    ctx = canvas.getContext("2d");
+    
+    for (var i=0; i<cvs.width; i+=1) {
+      for (var j=0; j<cvs.height; j+=1) {
+        ctx.fillStyle = "#333333";
+        ctx.fillRect(i*GRID_SIZE, j*GRID_SIZE, 1, 1);
+      }
+    }
+    
+    cvs.addEventListener("click", function(e) {
+      let rect = e.target.getBoundingClientRect();
+      let pos = [(e.x - rect.x) / GRID_SIZE, (e.y - rect.y) / GRID_SIZE];
+      
+      for (var i=0; i<components.length; i+=1) {
+        
+        if (components[i].type == "INPUT_DEVICE") {
+          if (components[i].pos[0] < pos[0] && pos[0] < (components[i].pos[0]+components[i].size[0])
+          && components[i].pos[1] < pos[1] && pos[1] < (components[i].pos[1]+components[i].size[1])) {
+            components[i].onclick();
+          }
+        }
+      }
+    });
+    
+    render(0);
+    
+  } 
+  
+  var render = function(t) {
+    for (var i=0; i<components.length; i+=1) {
+      components[i].update();
+      components[i].render();
+    }
+    
+    for (var i=0; i<wires.length; i+=1) {
+      wires[i].render();
+    }
+    
+    requestAnimationFrame(render);
+  }
+  
+  
+  </script>
+  
+</body>
+</html>
